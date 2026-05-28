@@ -25,14 +25,9 @@ python -m http.server 8765
 Then visit:
 
 ```text
-http://127.0.0.1:8765/management_overview.html
+http://managementoverview.netlify.app/
 ```
 
-Or open:
-
-```text
-http://127.0.0.1:8765/
-```
 
 ## Deploy
 
