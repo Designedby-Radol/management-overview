@@ -1,0 +1,745 @@
+
+<style>
+:root {
+  color-scheme: dark;
+  --font-sans: Inter, "Segoe UI", Arial, sans-serif;
+  --color-background-primary: #14161b;
+  --color-background-secondary: #1e222a;
+  --color-text-primary: #f4f7fb;
+  --color-text-secondary: #aeb8c7;
+  --color-text-tertiary: #7f8a9a;
+  --color-border-primary: #7f8a9a;
+  --color-border-secondary: #46505f;
+  --color-border-tertiary: #2c3440;
+  --border-radius-md: 8px;
+  --border-radius-lg: 8px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { min-height: 100%; background: var(--color-background-primary); color: var(--color-text-primary); }
+body { font-family: var(--font-sans); padding: 16px; }
+
+.rm-wrap { padding: 1.5rem 0; max-width: 680px; }
+
+.rm-header { margin-bottom: 2rem; }
+.rm-title { font-size: 22px; font-weight: 500; color: var(--color-text-primary); }
+.rm-subtitle { font-size: 14px; color: var(--color-text-secondary); margin-top: 4px; }
+.rm-progress-bar { height: 3px; background: var(--color-border-tertiary); border-radius: 2px; margin-top: 12px; }
+.rm-progress-fill { height: 100%; border-radius: 2px; background: #1D9E75; transition: width 0.5s ease; }
+
+.rm-nav { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 1.5rem; }
+.rm-nav-btn {
+  font-size: 12px; padding: 5px 12px; border-radius: 20px;
+  border: 0.5px solid var(--color-border-secondary);
+  background: transparent; color: var(--color-text-secondary);
+  cursor: pointer; transition: all 0.2s; font-family: var(--font-sans);
+}
+.rm-nav-btn:hover { border-color: var(--color-border-primary); color: var(--color-text-primary); }
+.rm-nav-btn.active {
+  background: var(--color-text-primary); color: var(--color-background-primary);
+  border-color: var(--color-text-primary);
+}
+.rm-nav-btn.done { border-color: #1D9E75; color: #0F6E56; }
+
+.rm-section { display: none; animation: fadeIn 0.3s ease; }
+.rm-section.visible { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+.rm-card {
+  background: var(--color-background-primary);
+  border: 0.5px solid var(--color-border-tertiary);
+  border-radius: var(--border-radius-lg);
+  padding: 1.25rem;
+  margin-bottom: 1rem;
+}
+.rm-card-title {
+  font-size: 16px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 6px;
+}
+.rm-card-body { font-size: 14px; color: var(--color-text-secondary); line-height: 1.7; }
+
+.rm-badge {
+  display: inline-block; font-size: 11px; padding: 3px 10px;
+  border-radius: 20px; font-weight: 500; margin-bottom: 10px;
+}
+.badge-teal { background: #E1F5EE; color: #0F6E56; }
+.badge-amber { background: #FAEEDA; color: #854F0B; }
+.badge-coral { background: #FAECE7; color: #993C1D; }
+.badge-purple { background: #EEEDFE; color: #534AB7; }
+.badge-blue { background: #E6F1FB; color: #185FA5; }
+.badge-gray { background: #F1EFE8; color: #5F5E5A; }
+
+/* Matrix */
+.matrix-grid {
+  display: grid;
+  grid-template-columns: auto repeat(5, 1fr);
+  grid-template-rows: auto repeat(5, 1fr);
+  gap: 3px;
+  margin: 1rem 0;
+}
+.matrix-cell {
+  height: 44px; border-radius: 4px; display: flex; align-items: center;
+  justify-content: center; font-size: 11px; text-align: center; font-weight: 500;
+  cursor: pointer; transition: transform 0.15s; position: relative;
+}
+.matrix-cell:hover { transform: scale(1.05); z-index: 2; }
+.matrix-label { background: transparent; font-size: 11px; color: var(--color-text-secondary); }
+.cell-low { background: #EAF3DE; color: #3B6D11; }
+.cell-med { background: #FAEEDA; color: #854F0B; }
+.cell-high { background: #FAECE7; color: #993C1D; }
+.cell-crit { background: #FCEBEB; color: #A32D2D; }
+.cell-selected { outline: 2px solid var(--color-text-primary); outline-offset: 1px; }
+
+/* Risk register table */
+.rr-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.rr-table th { text-align: left; font-weight: 500; font-size: 12px; color: var(--color-text-secondary); padding: 6px 8px; border-bottom: 0.5px solid var(--color-border-tertiary); }
+.rr-table td { padding: 8px; border-bottom: 0.5px solid var(--color-border-tertiary); vertical-align: top; }
+.rr-table tr:last-child td { border-bottom: none; }
+.rr-table tr:hover td { background: var(--color-background-secondary); }
+
+/* Strategy cards */
+.strat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 1rem 0; }
+.strat-card {
+  padding: 1rem; border-radius: var(--border-radius-md);
+  border: 0.5px solid var(--color-border-secondary);
+  cursor: pointer; transition: all 0.2s;
+}
+.strat-card:hover { border-color: var(--color-border-primary); }
+.strat-card.selected-strat { border-width: 1.5px; border-color: var(--color-text-primary); }
+.strat-card-icon { font-size: 20px; margin-bottom: 6px; }
+.strat-card-title { font-size: 14px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 4px; }
+.strat-card-body { font-size: 12px; color: var(--color-text-secondary); line-height: 1.5; }
+.strat-example { font-size: 11px; font-style: italic; color: var(--color-text-tertiary); margin-top: 6px; }
+
+/* Quiz */
+.quiz-opt {
+  padding: 10px 14px; border-radius: var(--border-radius-md);
+  border: 0.5px solid var(--color-border-secondary);
+  margin-bottom: 8px; cursor: pointer; font-size: 14px;
+  color: var(--color-text-primary); background: transparent;
+  text-align: left; width: 100%; font-family: var(--font-sans);
+  transition: all 0.2s;
+}
+.quiz-opt:hover { border-color: var(--color-border-primary); background: var(--color-background-secondary); }
+.quiz-opt.correct { background: #EAF3DE; border-color: #3B6D11; color: #27500A; }
+.quiz-opt.wrong { background: #FCEBEB; border-color: #A32D2D; color: #791F1F; }
+
+.rm-btn {
+  padding: 8px 20px; border-radius: 20px; font-size: 13px;
+  border: 0.5px solid var(--color-border-primary);
+  background: var(--color-text-primary); color: var(--color-background-primary);
+  cursor: pointer; font-family: var(--font-sans); transition: opacity 0.2s;
+  margin-top: 12px;
+}
+.rm-btn:hover { opacity: 0.85; }
+.rm-btn-ghost {
+  padding: 8px 20px; border-radius: 20px; font-size: 13px;
+  border: 0.5px solid var(--color-border-secondary);
+  background: transparent; color: var(--color-text-secondary);
+  cursor: pointer; font-family: var(--font-sans); transition: all 0.2s;
+  margin-top: 12px; margin-left: 8px;
+}
+.rm-btn-ghost:hover { color: var(--color-text-primary); border-color: var(--color-border-primary); }
+
+.kpi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 1rem 0; }
+.kpi-card { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 12px; }
+.kpi-label { font-size: 11px; color: var(--color-text-secondary); margin-bottom: 4px; }
+.kpi-value { font-size: 22px; font-weight: 500; color: var(--color-text-primary); }
+
+.rm-divider { height: 0.5px; background: var(--color-border-tertiary); margin: 1.25rem 0; }
+
+.tooltip-box {
+  background: var(--color-background-secondary);
+  border: 0.5px solid var(--color-border-secondary);
+  border-radius: var(--border-radius-md);
+  padding: 10px 14px; font-size: 13px; color: var(--color-text-secondary);
+  margin-top: 8px; line-height: 1.6; display: none;
+}
+.tooltip-box.show { display: block; }
+
+.level-intro { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 1.5rem; }
+.level-num { font-size: 32px; font-weight: 500; color: var(--color-text-primary); line-height: 1; min-width: 40px; }
+.level-meta {}
+.level-name { font-size: 18px; font-weight: 500; color: var(--color-text-primary); }
+.level-desc { font-size: 13px; color: var(--color-text-secondary); margin-top: 4px; line-height: 1.5; }
+
+.risk-sim-row { display: flex; align-items: center; gap: 8px; margin: 6px 0; flex-wrap: wrap; }
+.risk-sim-label { font-size: 13px; color: var(--color-text-secondary); min-width: 120px; }
+.risk-sim-slider { flex: 1; min-width: 100px; }
+.risk-sim-val { font-size: 13px; font-weight: 500; color: var(--color-text-primary); min-width: 28px; text-align: right; }
+.rer-box { padding: 10px 14px; border-radius: var(--border-radius-md); font-size: 14px; font-weight: 500; margin-top: 10px; text-align: center; }
+
+.framework-steps { counter-reset: step; }
+.fw-step { display: flex; gap: 12px; padding: 10px 0; border-bottom: 0.5px solid var(--color-border-tertiary); }
+.fw-step:last-child { border-bottom: none; }
+.fw-step-num {
+  min-width: 26px; height: 26px; border-radius: 50%;
+  background: var(--color-background-secondary);
+  border: 0.5px solid var(--color-border-secondary);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 500; color: var(--color-text-secondary); margin-top: 1px;
+}
+.fw-step-content {}
+.fw-step-title { font-size: 14px; font-weight: 500; color: var(--color-text-primary); }
+.fw-step-body { font-size: 13px; color: var(--color-text-secondary); margin-top: 2px; line-height: 1.5; }
+
+/* Dark-mode state palette */
+.badge-teal { background: #0f3f36; color: #9fe1cb; }
+.badge-amber { background: #3b2a10; color: #fac775; }
+.badge-coral { background: #3b2119; color: #f5c4b3; }
+.badge-purple { background: #29255a; color: #cecbf6; }
+.badge-blue { background: #102d4d; color: #b5d4f4; }
+.badge-gray { background: #2b2e34; color: #c2c8d1; }
+.cell-low { background: #1d3a20; color: #c0dd97; }
+.cell-med { background: #3b2a10; color: #fac775; }
+.cell-high { background: #3b2119; color: #f5c4b3; }
+.cell-crit { background: #471d22; color: #f7c1c1; }
+.quiz-opt.correct { background: #1d3a20; border-color: #97c459; color: #d6efbb; }
+.quiz-opt.wrong { background: #471d22; border-color: #f09595; color: #ffd1d1; }
+</style>
+
+<script>
+window.sendPrompt = window.sendPrompt || function(prompt) {
+  console.info("Prompt action:", prompt);
+};
+</script>
+
+<div class="rm-wrap">
+  <div class="rm-header">
+    <div class="rm-title">Risk Management</div>
+    <div class="rm-subtitle">Del cero al nivel profesional — 6 módulos progresivos</div>
+    <div class="rm-progress-bar"><div class="rm-progress-fill" id="progress" style="width:16%"></div></div>
+  </div>
+
+  <div class="rm-nav" id="nav">
+    <button class="rm-nav-btn active" onclick="showSection(0)">1 · Fundamentos</button>
+    <button class="rm-nav-btn" onclick="showSection(1)">2 · Identificación</button>
+    <button class="rm-nav-btn" onclick="showSection(2)">3 · Evaluación</button>
+    <button class="rm-nav-btn" onclick="showSection(3)">4 · Estrategias</button>
+    <button class="rm-nav-btn" onclick="showSection(4)">5 · Monitoreo</button>
+    <button class="rm-nav-btn" onclick="showSection(5)">6 · Pro Tools</button>
+  </div>
+
+  <!-- SECTION 0: FUNDAMENTOS -->
+  <div class="rm-section visible" id="s0">
+    <div class="level-intro">
+      <div class="level-num">01</div>
+      <div class="level-meta">
+        <div class="level-name">Fundamentos del riesgo</div>
+        <div class="level-desc">¿Qué es un riesgo? ¿Por qué existe? ¿Cuál es el lenguaje universal del risk management?</div>
+      </div>
+    </div>
+
+    <div class="rm-card">
+      <span class="rm-badge badge-teal">Definición core</span>
+      <div class="rm-card-title">Riesgo ≠ Problema</div>
+      <div class="rm-card-body">
+        Un <strong>riesgo</strong> es un evento incierto que, si ocurre, tiene un impacto sobre los objetivos. Un <strong>problema</strong> (issue) ya ocurrió. Esta distinción es fundamental — la gestión de riesgos es proactiva, no reactiva.
+        <br><br>
+        <strong>Fórmula base:</strong> Riesgo = Probabilidad × Impacto
+      </div>
+    </div>
+
+    <div class="rm-card">
+      <span class="rm-badge badge-amber">Los 3 tipos de riesgo</span>
+      <div class="rm-card-title">Tipología universal</div>
+      <div class="rm-card-body">
+        <div class="framework-steps">
+          <div class="fw-step">
+            <div class="fw-step-num">T</div>
+            <div class="fw-step-content">
+              <div class="fw-step-title">Amenaza (Threat)</div>
+              <div class="fw-step-body">Evento negativo. Si ocurre, daña el proyecto u operación. Hay que mitigarlo.</div>
+            </div>
+          </div>
+          <div class="fw-step">
+            <div class="fw-step-num">O</div>
+            <div class="fw-step-content">
+              <div class="fw-step-title">Oportunidad (Opportunity)</div>
+              <div class="fw-step-body">Evento positivo. Si ocurre, beneficia. Hay que explotarlo o maximizarlo. A menudo ignorado.</div>
+            </div>
+          </div>
+          <div class="fw-step">
+            <div class="fw-step-num">I</div>
+            <div class="fw-step-content">
+              <div class="fw-step-title">Incertidumbre pura</div>
+              <div class="fw-step-body">No sabes si es positivo o negativo hasta que ocurre. Requiere análisis de escenarios.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="rm-card">
+      <span class="rm-badge badge-purple">Frameworks de referencia</span>
+      <div class="rm-card-title">¿De dónde viene este conocimiento?</div>
+      <div class="rm-card-body">
+        <div class="framework-steps">
+          <div class="fw-step"><div class="fw-step-num">1</div><div class="fw-step-content"><div class="fw-step-title">PMBOK (PMI)</div><div class="fw-step-body">Risk Management como área de conocimiento en proyectos. Estándar global para PMs.</div></div></div>
+          <div class="fw-step"><div class="fw-step-num">2</div><div class="fw-step-content"><div class="fw-step-title">ISO 31000</div><div class="fw-step-body">Estándar internacional de gestión de riesgos para organizaciones. Más amplio que proyectos.</div></div></div>
+          <div class="fw-step"><div class="fw-step-num">3</div><div class="fw-step-content"><div class="fw-step-title">COSO ERM</div><div class="fw-step-body">Enterprise Risk Management. Framework financiero/corporativo. Muy usado en big corps.</div></div></div>
+          <div class="fw-step"><div class="fw-step-num">4</div><div class="fw-step-content"><div class="fw-step-title">Lean / Agile</div><div class="fw-step-body">Risk como parte del flujo continuo. Iteration risk, sprint risk, etc.</div></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="kpi-grid">
+      <div class="kpi-card"><div class="kpi-label">Aprendiste</div><div class="kpi-value" style="font-size:16px;margin-top:4px">Riesgo vs Issue</div></div>
+      <div class="kpi-card"><div class="kpi-label">Formula clave</div><div class="kpi-value" style="font-size:16px;margin-top:4px">P × I = Exposición</div></div>
+      <div class="kpi-card"><div class="kpi-label">Frameworks</div><div class="kpi-value">4</div></div>
+    </div>
+
+    <button class="rm-btn" onclick="nextSection(0)">Continuar → Identificación ↗</button>
+  </div>
+
+  <!-- SECTION 1: IDENTIFICACIÓN -->
+  <div class="rm-section" id="s1">
+    <div class="level-intro">
+      <div class="level-num">02</div>
+      <div class="level-meta">
+        <div class="level-name">Identificación de riesgos</div>
+        <div class="level-desc">Técnicas profesionales para descubrir riesgos antes de que te golpeen. No se puede gestionar lo que no se ha identificado.</div>
+      </div>
+    </div>
+
+    <div class="rm-card">
+      <span class="rm-badge badge-teal">Técnica 1</span>
+      <div class="rm-card-title">Estructura de Desglose de Riesgos (RBS)</div>
+      <div class="rm-card-body">
+        Igual que el WBS para el scope, el <strong>RBS (Risk Breakdown Structure)</strong> organiza las fuentes de riesgo en categorías jerárquicas. Evita que se te olvide una categoría entera.
+        <br><br>
+        Categorías típicas: Técnico · Externo · Organizacional · Gestión · Financiero · Legal · RRHH
+      </div>
+    </div>
+
+    <div class="rm-card">
+      <span class="rm-badge badge-amber">Técnica 2 — Interactivo</span>
+      <div class="rm-card-title">Análisis de supuestos (Assumptions Analysis)</div>
+      <div class="rm-card-body">
+        Todo plan se basa en supuestos. Si un supuesto falla, aparece un riesgo. Haz clic en cada supuesto para ver el riesgo asociado:
+      </div>
+      <div style="margin-top:12px; display:flex; flex-wrap:wrap; gap:6px;">
+        <button class="rm-btn-ghost" style="margin:0;font-size:12px" onclick="showAssumption('a1', this)">El proveedor entrega a tiempo</button>
+        <button class="rm-btn-ghost" style="margin:0;font-size:12px" onclick="showAssumption('a2', this)">El presupuesto no cambiará</button>
+        <button class="rm-btn-ghost" style="margin:0;font-size:12px" onclick="showAssumption('a3', this)">El equipo tiene las habilidades</button>
+        <button class="rm-btn-ghost" style="margin:0;font-size:12px" onclick="showAssumption('a4', this)">La regulación se mantiene estable</button>
+      </div>
+      <div class="tooltip-box" id="a1">⚠️ <strong>Riesgo:</strong> Retrasos en la cadena de suministro → retraso general del proyecto. Impacto: Alto. Categoría: Externo.</div>
+      <div class="tooltip-box" id="a2">⚠️ <strong>Riesgo:</strong> Recorte presupuestario → scope reduction o cancelación. Impacto: Crítico. Categoría: Financiero.</div>
+      <div class="tooltip-box" id="a3">⚠️ <strong>Riesgo:</strong> Skill gap → baja calidad o retrabajos. Impacto: Alto. Categoría: RRHH.</div>
+      <div class="tooltip-box" id="a4">⚠️ <strong>Riesgo:</strong> Cambio regulatorio → necesidad de rediseño. Impacto: Alto. Categoría: Legal/Externo.</div>
+    </div>
+
+    <div class="rm-card">
+      <span class="rm-badge badge-coral">Técnica 3</span>
+      <div class="rm-card-title">SWOT aplicado al riesgo</div>
+      <div class="rm-card-body">
+        Las <strong>Debilidades y Amenazas</strong> del SWOT son fuentes directas de riesgos negativos. Las <strong>Fortalezas y Oportunidades</strong> son fuentes de riesgos positivos (oportunidades de explotar). Conectar SWOT con el risk register es una práctica pro.
+      </div>
+    </div>
+
+    <div class="rm-card">
+      <span class="rm-badge badge-blue">Técnica 4</span>
+      <div class="rm-card-title">Prompt de identificación (para reuniones)</div>
+      <div class="rm-card-body">
+        En una sesión de identificación con el equipo, usa estas preguntas gatillo:
+        <br><br>
+        • ¿Qué podría evitar que alcancemos el objetivo?<br>
+        • ¿Qué cosas asumimos que podrían ser falsas?<br>
+        • ¿Qué nos ha fallado antes en proyectos similares?<br>
+        • ¿Qué dependencias externas existen?<br>
+        • ¿Qué pasa si perdemos a la persona clave del equipo?
+      </div>
+    </div>
+
+    <button class="rm-btn" onclick="nextSection(1)">Continuar → Evaluación ↗</button>
+    <button class="rm-btn-ghost" onclick="showSection(0)">← Volver</button>
+  </div>
+
+  <!-- SECTION 2: EVALUACIÓN (MATRIZ) -->
+  <div class="rm-section" id="s2">
+    <div class="level-intro">
+      <div class="level-num">03</div>
+      <div class="level-meta">
+        <div class="level-name">Evaluación y priorización</div>
+        <div class="level-desc">La Matriz de Probabilidad × Impacto es la herramienta central. También: análisis cualitativo vs cuantitativo y el Expected Monetary Value (EMV).</div>
+      </div>
+    </div>
+
+    <div class="rm-card">
+      <span class="rm-badge badge-teal">Herramienta core</span>
+      <div class="rm-card-title">Matriz P×I — Haz clic en cualquier celda</div>
+      <div class="rm-card-body" style="margin-bottom:10px">Probabilidad (eje vertical) × Impacto (eje horizontal)</div>
+      <div class="matrix-grid" id="matrix">
+        <!-- Row labels -->
+        <div class="matrix-cell matrix-label" style="writing-mode:vertical-rl;text-orientation:mixed;transform:rotate(180deg);font-size:10px;height:auto;padding:4px 0">Probabilidad →</div>
+        <div class="matrix-cell matrix-label">Muy baja</div>
+        <div class="matrix-cell matrix-label">Baja</div>
+        <div class="matrix-cell matrix-label">Media</div>
+        <div class="matrix-cell matrix-label">Alta</div>
+        <div class="matrix-cell matrix-label">Muy alta</div>
+        <!-- Row 5: muy alta prob -->
+        <div class="matrix-cell matrix-label">Muy alta</div>
+        <div class="matrix-cell cell-med"    onclick="cellClick(this,'Prob. Muy alta × Impacto Muy bajo','Monitoreo básico. El riesgo ocurrirá pero no duele.')">Med</div>
+        <div class="matrix-cell cell-high"   onclick="cellClick(this,'Prob. Muy alta × Impacto Bajo','Mitigar activamente. Alta frecuencia puede acumularse.')">Alto</div>
+        <div class="matrix-cell cell-high"   onclick="cellClick(this,'Prob. Muy alta × Impacto Medio','Zona de atención prioritaria. Plan de respuesta inmediato.')">Alto</div>
+        <div class="matrix-cell cell-crit"   onclick="cellClick(this,'Prob. Muy alta × Impacto Alto','CRÍTICO. Escalar. Plan de contingencia y reserva presupuestal.')">Crítico</div>
+        <div class="matrix-cell cell-crit"   onclick="cellClick(this,'Prob. Muy alta × Impacto Muy alto','SHOWSTOPPER. Puede cancelar el proyecto. Acción inmediata.')">Crítico</div>
+        <!-- Row 4: alta -->
+        <div class="matrix-cell matrix-label">Alta</div>
+        <div class="matrix-cell cell-low"    onclick="cellClick(this,'Prob. Alta × Impacto Muy bajo','Zona verde. Aceptar o mitigar bajo coste.')">Bajo</div>
+        <div class="matrix-cell cell-med"    onclick="cellClick(this,'Prob. Alta × Impacto Bajo','Monitorear. Puede convertirse en issue si no se gestiona.')">Med</div>
+        <div class="matrix-cell cell-high"   onclick="cellClick(this,'Prob. Alta × Impacto Medio','Requiere plan de mitigación activo y owner designado.')">Alto</div>
+        <div class="matrix-cell cell-high"   onclick="cellClick(this,'Prob. Alta × Impacto Alto','Alta prioridad. Escalar al sponsor si persiste.')">Alto</div>
+        <div class="matrix-cell cell-crit"   onclick="cellClick(this,'Prob. Alta × Impacto Muy alto','CRÍTICO. Necesita escalación y contingencia robusta.')">Crítico</div>
+        <!-- Row 3: media -->
+        <div class="matrix-cell matrix-label">Media</div>
+        <div class="matrix-cell cell-low"    onclick="cellClick(this,'Prob. Media × Impacto Muy bajo','Zona verde. Aceptar.')">Bajo</div>
+        <div class="matrix-cell cell-low"    onclick="cellClick(this,'Prob. Media × Impacto Bajo','Zona verde. Monitoreo ligero.')">Bajo</div>
+        <div class="matrix-cell cell-med"    onclick="cellClick(this,'Prob. Media × Impacto Medio','Zona amarilla. Revisión mensual. Dueño asignado.')">Med</div>
+        <div class="matrix-cell cell-high"   onclick="cellClick(this,'Prob. Media × Impacto Alto','Vigilancia activa. Preparar plan de contingencia.')">Alto</div>
+        <div class="matrix-cell cell-high"   onclick="cellClick(this,'Prob. Media × Impacto Muy alto','Vigilancia activa. Si la probabilidad sube → CRÍTICO.')">Alto</div>
+        <!-- Row 2: baja -->
+        <div class="matrix-cell matrix-label">Baja</div>
+        <div class="matrix-cell cell-low"    onclick="cellClick(this,'Prob. Baja × Impacto Muy bajo','Ignorar o aceptar. No merece inversión de tiempo.')">Bajo</div>
+        <div class="matrix-cell cell-low"    onclick="cellClick(this,'Prob. Baja × Impacto Bajo','Zona verde. Log en registro. Revisión trimestral.')">Bajo</div>
+        <div class="matrix-cell cell-low"    onclick="cellClick(this,'Prob. Baja × Impacto Medio','Zona verde. Incluir en risk register. Watchlist.')">Bajo</div>
+        <div class="matrix-cell cell-med"    onclick="cellClick(this,'Prob. Baja × Impacto Alto','Aunque improbable, el impacto justifica preparación mínima.')">Med</div>
+        <div class="matrix-cell cell-high"   onclick="cellClick(this,'Prob. Baja × Impacto Muy alto','Black swan watch. Seguro o transferencia recomendada.')">Alto</div>
+        <!-- Row 1: muy baja -->
+        <div class="matrix-cell matrix-label">Muy baja</div>
+        <div class="matrix-cell cell-low"    onclick="cellClick(this,'Prob. Muy baja × Impacto Muy bajo','Ruido de fondo. No gestionar.')">Bajo</div>
+        <div class="matrix-cell cell-low"    onclick="cellClick(this,'Prob. Muy baja × Impacto Bajo','No gestionar activamente.')">Bajo</div>
+        <div class="matrix-cell cell-low"    onclick="cellClick(this,'Prob. Muy baja × Impacto Medio','Log pasivo. Revisar si contexto cambia.')">Bajo</div>
+        <div class="matrix-cell cell-low"    onclick="cellClick(this,'Prob. Muy baja × Impacto Alto','Seguro barato si existe. Sino: aceptar.')">Bajo</div>
+        <div class="matrix-cell cell-med"    onclick="cellClick(this,'Prob. Muy baja × Impacto Muy alto','Black swan. Monitorear señales tempranas.')">Med</div>
+      </div>
+      <div class="tooltip-box show" id="matrix-tooltip" style="display:block">👆 Haz clic en cualquier celda para ver la recomendación de gestión.</div>
+    </div>
+
+    <div class="rm-card">
+      <span class="rm-badge badge-amber">Cuantitativo</span>
+      <div class="rm-card-title">Expected Monetary Value (EMV) — Simulador</div>
+      <div class="rm-card-body" style="margin-bottom:12px">El EMV te dice cuánto dinero esperas perder (o ganar) en promedio: <strong>EMV = Probabilidad × Impacto ($)</strong></div>
+
+      <div class="risk-sim-row">
+        <div class="risk-sim-label">Probabilidad</div>
+        <input type="range" class="risk-sim-slider" min="0" max="100" value="30" id="emv-prob" oninput="calcEMV()">
+        <div class="risk-sim-val" id="emv-prob-v">30%</div>
+      </div>
+      <div class="risk-sim-row">
+        <div class="risk-sim-label">Impacto ($)</div>
+        <input type="range" class="risk-sim-slider" min="1000" max="500000" step="1000" value="80000" id="emv-imp" oninput="calcEMV()">
+        <div class="risk-sim-val" id="emv-imp-v">$80k</div>
+      </div>
+      <div class="rer-box" id="emv-result" style="background:var(--color-background-secondary)">EMV = <strong>$24,000</strong> de exposición esperada</div>
+      <div style="font-size:12px;color:var(--color-text-secondary);margin-top:6px">Si el costo de mitigar es menor que el EMV → vale la pena mitigar.</div>
+    </div>
+
+    <button class="rm-btn" onclick="nextSection(2)">Continuar → Estrategias ↗</button>
+    <button class="rm-btn-ghost" onclick="showSection(1)">← Volver</button>
+  </div>
+
+  <!-- SECTION 3: ESTRATEGIAS -->
+  <div class="rm-section" id="s3">
+    <div class="level-intro">
+      <div class="level-num">04</div>
+      <div class="level-meta">
+        <div class="level-name">Estrategias de respuesta</div>
+        <div class="level-desc">Para cada riesgo identificado y evaluado, eliges una estrategia. Hay 4 para amenazas y 4 para oportunidades.</div>
+      </div>
+    </div>
+
+    <div class="rm-card">
+      <span class="rm-badge badge-coral">Para amenazas (riesgos negativos)</span>
+      <div class="rm-card-title">Las 4T: Treat · Transfer · Tolerate · Terminate</div>
+      <div class="strat-grid" id="threat-strats">
+        <div class="strat-card" onclick="selectStrat(this,'treat')">
+          <div class="strat-card-icon">🛡️</div>
+          <div class="strat-card-title">Mitigar (Treat/Reduce)</div>
+          <div class="strat-card-body">Reducir probabilidad y/o impacto mediante acciones preventivas.</div>
+          <div class="strat-example">Ej: Añadir buffer de tiempo al cronograma para reducir riesgo de retraso.</div>
+        </div>
+        <div class="strat-card" onclick="selectStrat(this,'transfer')">
+          <div class="strat-card-icon">🔄</div>
+          <div class="strat-card-title">Transferir (Transfer)</div>
+          <div class="strat-card-body">Mover el impacto financiero a un tercero. No eliminas el riesgo, solo el dolor económico.</div>
+          <div class="strat-example">Ej: Contratar un seguro. Outsourcing con penalidades contractuales.</div>
+        </div>
+        <div class="strat-card" onclick="selectStrat(this,'tolerate')">
+          <div class="strat-card-icon">✅</div>
+          <div class="strat-card-title">Aceptar (Tolerate/Accept)</div>
+          <div class="strat-card-body">Decidir conscientemente no actuar. Válido cuando el costo de respuesta > EMV.</div>
+          <div class="strat-example">Ej: Riesgo de lluvia para evento exterior. Costo de carpa > costo esperado.</div>
+        </div>
+        <div class="strat-card" onclick="selectStrat(this,'terminate')">
+          <div class="strat-card-icon">🚫</div>
+          <div class="strat-card-title">Eliminar (Terminate/Avoid)</div>
+          <div class="strat-card-body">Cambiar el plan para que el riesgo deje de existir. La más poderosa pero a menudo la más costosa.</div>
+          <div class="strat-example">Ej: Cancelar un feature arriesgado. Cambiar proveedor desde el inicio.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="rm-card">
+      <span class="rm-badge badge-teal">Para oportunidades (riesgos positivos)</span>
+      <div class="rm-card-title">Las 4E: Exploit · Enhance · Share · Ignore</div>
+      <div class="strat-grid">
+        <div class="strat-card">
+          <div class="strat-card-icon">💥</div>
+          <div class="strat-card-title">Explotar</div>
+          <div class="strat-card-body">Asegurar que la oportunidad ocurra. Eliminar la incertidumbre positiva.</div>
+          <div class="strat-example">Ej: Asignar tu mejor recurso a una tarea que podría entregarse antes.</div>
+        </div>
+        <div class="strat-card">
+          <div class="strat-card-icon">📈</div>
+          <div class="strat-card-title">Mejorar (Enhance)</div>
+          <div class="strat-card-body">Aumentar la probabilidad o el impacto positivo. No lo garantiza, pero lo maximiza.</div>
+          <div class="strat-example">Ej: Capacitar al equipo para que pueda tomar la oportunidad si llega.</div>
+        </div>
+        <div class="strat-card">
+          <div class="strat-card-icon">🤝</div>
+          <div class="strat-card-title">Compartir (Share)</div>
+          <div class="strat-card-body">Traspasar parte del upside a un tercero mejor posicionado para capitalizarlo.</div>
+          <div class="strat-example">Ej: Joint venture cuando un partner tiene mejor acceso al mercado.</div>
+        </div>
+        <div class="strat-card">
+          <div class="strat-card-icon">🙈</div>
+          <div class="strat-card-title">Ignorar (Accept)</div>
+          <div class="strat-card-body">Aceptar si ocurre, pero no invertir para que ocurra. Válido para oportunidades menores.</div>
+          <div class="strat-example">Ej: Si un cliente adicional llama, genial. Pero no lo perseguimos activamente.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="rm-card">
+      <span class="rm-badge badge-purple">Concepto avanzado</span>
+      <div class="rm-card-title">Residual Risk vs Secondary Risk</div>
+      <div class="rm-card-body">
+        <strong>Riesgo residual:</strong> El riesgo que queda DESPUÉS de aplicar tu estrategia de respuesta. Nunca llegas a cero.<br><br>
+        <strong>Riesgo secundario:</strong> El riesgo NUEVO que creaste al aplicar tu respuesta al riesgo original. Ej: contratar un seguro → riesgo de que la aseguradora no pague.<br><br>
+        Un profesional siempre evalúa ambos antes de decidir una estrategia.
+      </div>
+    </div>
+
+    <button class="rm-btn" onclick="nextSection(3)">Continuar → Monitoreo ↗</button>
+    <button class="rm-btn-ghost" onclick="showSection(2)">← Volver</button>
+  </div>
+
+  <!-- SECTION 4: MONITOREO -->
+  <div class="rm-section" id="s4">
+    <div class="level-intro">
+      <div class="level-num">05</div>
+      <div class="level-meta">
+        <div class="level-name">Risk Register y monitoreo</div>
+        <div class="level-desc">El Risk Register es el documento vivo central. Aprende a construirlo y a mantenerlo activo — sin mantenimiento se convierte en falsa seguridad.</div>
+      </div>
+    </div>
+
+    <div class="rm-card">
+      <span class="rm-badge badge-teal">Herramienta central</span>
+      <div class="rm-card-title">Risk Register — Ejemplo real</div>
+      <div class="rm-card-body" style="overflow-x:auto">
+        <table class="rr-table">
+          <thead>
+            <tr>
+              <th>ID</th><th>Riesgo</th><th>Categ.</th><th>Prob</th><th>Imp.</th><th>EMV</th><th>Estrategia</th><th>Owner</th><th>Estado</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>R-01</td>
+              <td>Proveedor entrega tarde</td>
+              <td><span class="rm-badge badge-amber" style="font-size:10px">Externo</span></td>
+              <td>40%</td>
+              <td>Alto</td>
+              <td>$32k</td>
+              <td>Mitigar + buffer</td>
+              <td>Ana G.</td>
+              <td><span class="rm-badge badge-amber" style="font-size:10px">Activo</span></td>
+            </tr>
+            <tr>
+              <td>R-02</td>
+              <td>Fuga de talento clave</td>
+              <td><span class="rm-badge badge-purple" style="font-size:10px">RRHH</span></td>
+              <td>20%</td>
+              <td>Crítico</td>
+              <td>$60k</td>
+              <td>Mitigar (retención)</td>
+              <td>CEO</td>
+              <td><span class="rm-badge badge-coral" style="font-size:10px">Escalado</span></td>
+            </tr>
+            <tr>
+              <td>R-03</td>
+              <td>Cambio regulatorio</td>
+              <td><span class="rm-badge badge-blue" style="font-size:10px">Legal</span></td>
+              <td>15%</td>
+              <td>Alto</td>
+              <td>$22k</td>
+              <td>Monitorear</td>
+              <td>Legal</td>
+              <td><span class="rm-badge badge-teal" style="font-size:10px">Watch</span></td>
+            </tr>
+            <tr>
+              <td>R-04</td>
+              <td>Aceleración de demanda</td>
+              <td><span class="rm-badge badge-teal" style="font-size:10px">Oport.</span></td>
+              <td>35%</td>
+              <td>Alto</td>
+              <td>+$45k</td>
+              <td>Explotar</td>
+              <td>Ventas</td>
+              <td><span class="rm-badge badge-teal" style="font-size:10px">Activo</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="rm-card">
+      <span class="rm-badge badge-amber">Monitoreo continuo</span>
+      <div class="rm-card-title">Risk Triggers (señales de alerta)</div>
+      <div class="rm-card-body">
+        Para cada riesgo debes definir <strong>triggers</strong>: señales observables que indican que el riesgo está materializándose. Son como trip wires.<br><br>
+        <div class="framework-steps">
+          <div class="fw-step"><div class="fw-step-num">→</div><div class="fw-step-content"><div class="fw-step-title">Trigger de R-01</div><div class="fw-step-body">El proveedor no confirma despacho 10 días antes de la fecha pactada.</div></div></div>
+          <div class="fw-step"><div class="fw-step-num">→</div><div class="fw-step-content"><div class="fw-step-title">Trigger de R-02</div><div class="fw-step-body">Empleado clave activa LinkedIn o rechaza 2 invitaciones a eventos de equipo.</div></div></div>
+          <div class="fw-step"><div class="fw-step-num">→</div><div class="fw-step-content"><div class="fw-step-title">Trigger de R-03</div><div class="fw-step-body">Publicación de borrador de regulación en Gaceta Oficial.</div></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="rm-card">
+      <span class="rm-badge badge-coral">Gobernanza</span>
+      <div class="rm-card-title">¿Con qué frecuencia se revisa el Risk Register?</div>
+      <div class="rm-card-body">
+        <div class="framework-steps">
+          <div class="fw-step"><div class="fw-step-num">D</div><div class="fw-step-content"><div class="fw-step-title">Diario</div><div class="fw-step-body">Riesgos críticos activos o en fase caliente del proyecto.</div></div></div>
+          <div class="fw-step"><div class="fw-step-num">S</div><div class="fw-step-content"><div class="fw-step-title">Semanal</div><div class="fw-step-body">Riesgos altos en fase de ejecución. Se revisa en el standup o reunión de proyecto.</div></div></div>
+          <div class="fw-step"><div class="fw-step-num">M</div><div class="fw-step-content"><div class="fw-step-title">Mensual</div><div class="fw-step-body">Revisión completa del registro. Reclasificación, cierre de riesgos, nuevas amenazas.</div></div></div>
+          <div class="fw-step"><div class="fw-step-num">E</div><div class="fw-step-content"><div class="fw-step-title">Por evento</div><div class="fw-step-body">Cualquier cambio de scope, presupuesto o equipo activa una revisión puntual.</div></div></div>
+        </div>
+      </div>
+    </div>
+
+    <button class="rm-btn" onclick="nextSection(4)">Continuar → Pro Tools ↗</button>
+    <button class="rm-btn-ghost" onclick="showSection(3)">← Volver</button>
+  </div>
+
+  <!-- SECTION 5: PRO TOOLS -->
+  <div class="rm-section" id="s5">
+    <div class="level-intro">
+      <div class="level-num">06</div>
+      <div class="level-meta">
+        <div class="level-name">Nivel profesional — Herramientas avanzadas</div>
+        <div class="level-desc">Monte Carlo, Bow-Tie Analysis, Risk Appetite y cómo conectar risk management con estrategia y operaciones.</div>
+      </div>
+    </div>
+
+    <div class="rm-card">
+      <span class="rm-badge badge-purple">Cuantitativo avanzado</span>
+      <div class="rm-card-title">Simulación Monte Carlo</div>
+      <div class="rm-card-body">
+        En lugar de un solo valor de probabilidad e impacto, usas <strong>distribuciones de probabilidad</strong> (optimista / más probable / pesimista) y corres miles de simulaciones para obtener un rango de resultados.<br><br>
+        <strong>Output típico:</strong> "El 80% de los escenarios termina entre $120k y $180k de sobrecosto." Esto permite definir la reserva de contingencia con rigor estadístico.<br><br>
+        <strong>Herramientas:</strong> @RISK (Excel plugin), Crystal Ball, Python (numpy/scipy), Primavera.
+      </div>
+    </div>
+
+    <div class="rm-card">
+      <span class="rm-badge badge-coral">Análisis visual</span>
+      <div class="rm-card-title">Bow-Tie Analysis (Corbata)</div>
+      <div class="rm-card-body">
+        Visualiza el riesgo como una corbata: a la izquierda van las <strong>causas → controles preventivos → evento</strong>. A la derecha van <strong>evento → controles de mitigación → consecuencias</strong>.<br><br>
+        Muy usado en industrias de alto riesgo (oil & gas, aviación, construcción). Muestra en un solo diagrama la lógica causal completa y las barreras de control.
+      </div>
+    </div>
+
+    <div class="rm-card">
+      <span class="rm-badge badge-amber">Estrategia organizacional</span>
+      <div class="rm-card-title">Risk Appetite vs Risk Tolerance</div>
+      <div class="rm-card-body">
+        <div class="framework-steps">
+          <div class="fw-step"><div class="fw-step-num">A</div><div class="fw-step-content"><div class="fw-step-title">Risk Appetite (apetito)</div><div class="fw-step-body">Cantidad de riesgo que la organización está dispuesta a asumir en busca de valor. Es una declaración estratégica. Ej: "Somos agresivos en innovación, conservadores en compliance."</div></div></div>
+          <div class="fw-step"><div class="fw-step-num">T</div><div class="fw-step-content"><div class="fw-step-title">Risk Tolerance (tolerancia)</div><div class="fw-step-body">Desviación aceptable alrededor del apetito. Ej: "Podemos tolerar hasta 15% de sobrecosto en proyectos de I+D." Es el límite operativo.</div></div></div>
+          <div class="fw-step"><div class="fw-step-num">C</div><div class="fw-step-content"><div class="fw-step-title">Risk Threshold</div><div class="fw-step-body">El punto exacto donde se activa una respuesta o escalación. Ej: "Si el sobrecosto supera 12%, se activa comité de crisis."</div></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="rm-card">
+      <span class="rm-badge badge-teal">Conexión con operaciones</span>
+      <div class="rm-card-title">Risk Management ↔ los frameworks que ya conoces</div>
+      <div class="rm-card-body">
+        <div class="framework-steps">
+          <div class="fw-step"><div class="fw-step-num">↔</div><div class="fw-step-content"><div class="fw-step-title">Risk Management + S&OP</div><div class="fw-step-body">En S&OP, los riesgos de demanda/supply entran como inputs al paso de Pre-S&OP. La reserva de capacidad es una respuesta a riesgos de forecast.</div></div></div>
+          <div class="fw-step"><div class="fw-step-num">↔</div><div class="fw-step-content"><div class="fw-step-title">Risk Management + ToC</div><div class="fw-step-body">El cuello de botella es el mayor concentrador de riesgo operacional. Subordinar al constraint reduce variabilidad sistémica.</div></div></div>
+          <div class="fw-step"><div class="fw-step-num">↔</div><div class="fw-step-content"><div class="fw-step-title">Risk Management + WIP Limits</div><div class="fw-step-body">El exceso de WIP es en sí mismo un riesgo: amplifica el impacto de cualquier falla. Limitar WIP = reducir exposición sistémica.</div></div></div>
+          <div class="fw-step"><div class="fw-step-num">↔</div><div class="fw-step-content"><div class="fw-step-title">Risk Management + BRD</div><div class="fw-step-body">El BRD incluye una sección de riesgos. Los riesgos del BRD se derivan del risk register del proyecto.</div></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="kpi-grid">
+      <div class="kpi-card"><div class="kpi-label">Módulos completados</div><div class="kpi-value">6 / 6</div></div>
+      <div class="kpi-card"><div class="kpi-label">Herramientas aprendidas</div><div class="kpi-value">12+</div></div>
+      <div class="kpi-card"><div class="kpi-label">Nivel</div><div class="kpi-value" style="font-size:16px;margin-top:4px">Profesional</div></div>
+    </div>
+
+    <button class="rm-btn-ghost" onclick="showSection(4)">← Volver</button>
+  </div>
+</div>
+
+<script>
+let progress = [true, false, false, false, false, false];
+
+function showSection(i) {
+  document.querySelectorAll('.rm-section').forEach(s => s.classList.remove('visible'));
+  document.getElementById('s'+i).classList.add('visible');
+  const btns = document.querySelectorAll('.rm-nav-btn');
+  btns.forEach((b,j) => {
+    b.classList.remove('active');
+    if (progress[j] && j !== i) b.classList.add('done');
+    else b.classList.remove('done');
+  });
+  btns[i].classList.add('active');
+  btns[i].classList.remove('done');
+}
+
+function nextSection(i) {
+  progress[i+1] = true;
+  const pct = Math.round((progress.filter(Boolean).length / 6) * 100);
+  document.getElementById('progress').style.width = pct + '%';
+  showSection(i+1);
+}
+
+function cellClick(el, title, desc) {
+  document.querySelectorAll('.matrix-cell').forEach(c => c.classList.remove('cell-selected'));
+  el.classList.add('cell-selected');
+  const t = document.getElementById('matrix-tooltip');
+  t.innerHTML = '<strong>' + title + '</strong><br>' + desc;
+  t.classList.add('show');
+  t.style.display = 'block';
+}
+
+function showAssumption(id, btn) {
+  document.querySelectorAll('.tooltip-box').forEach(t => { if(t.id.startsWith('a')) { t.classList.remove('show'); t.style.display='none'; }});
+  const box = document.getElementById(id);
+  box.style.display = 'block';
+  box.classList.add('show');
+}
+
+function calcEMV() {
+  const prob = parseInt(document.getElementById('emv-prob').value);
+  const imp = parseInt(document.getElementById('emv-imp').value);
+  document.getElementById('emv-prob-v').textContent = prob + '%';
+  const impK = imp >= 1000 ? '$' + Math.round(imp/1000) + 'k' : '$' + imp;
+  document.getElementById('emv-imp-v').textContent = impK;
+  const emv = Math.round((prob/100) * imp);
+  const emvK = emv >= 1000 ? '$' + Math.round(emv/1000) + 'k' : '$' + emv;
+  document.getElementById('emv-result').innerHTML = 'EMV = <strong>' + emvK + '</strong> de exposición esperada';
+}
+
+function selectStrat(el, type) {
+  document.querySelectorAll('#threat-strats .strat-card').forEach(c => c.classList.remove('selected-strat'));
+  el.classList.add('selected-strat');
+}
+</script>

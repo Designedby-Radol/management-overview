@@ -1,0 +1,288 @@
+
+<style>
+  :root {
+    color-scheme: dark;
+    --font-sans: Inter, "Segoe UI", Arial, sans-serif;
+    --color-background-primary: #14161b;
+    --color-background-secondary: #1e222a;
+    --color-text-primary: #f4f7fb;
+    --color-text-secondary: #aeb8c7;
+    --color-text-tertiary: #7f8a9a;
+    --color-border-primary: #7f8a9a;
+    --color-border-secondary: #46505f;
+    --color-border-tertiary: #2c3440;
+    --border-radius-md: 8px;
+    --border-radius-lg: 8px;
+  }
+  * { box-sizing: border-box; }
+  html, body { min-height: 100%; margin: 0; background: var(--color-background-primary); color: var(--color-text-primary); }
+  body { padding: 16px; }
+  .wrap { padding: 1rem 0; font-family: var(--font-sans); }
+  .board { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 1.5rem; }
+  .col { background: var(--color-background-secondary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 10px; min-height: 220px; }
+  .col-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+  .col-title { font-size: 13px; font-weight: 500; color: var(--color-text-primary); }
+  .wip-badge { font-size: 11px; padding: 2px 7px; border-radius: 99px; font-weight: 500; }
+  .wip-ok   { background: #EAF3DE; color: #3B6D11; }
+  .wip-warn { background: #FAEEDA; color: #854F0B; }
+  .wip-over { background: #FCEBEB; color: #A32D2D; }
+  .ticket { border-radius: 6px; padding: 8px 10px; margin-bottom: 6px; font-size: 12px; cursor: pointer; border: 0.5px solid transparent; transition: transform 0.15s, opacity 0.2s; }
+  .ticket:hover { transform: translateY(-1px); }
+  .ticket-title { font-weight: 500; color: var(--color-text-primary); margin-bottom: 2px; }
+  .ticket-tag { font-size: 10px; color: var(--color-text-secondary); }
+  .t-blue   { background: #E6F1FB; border-color: #85B7EB; }
+  .t-green  { background: #EAF3DE; border-color: #97C459; }
+  .t-amber  { background: #FAEEDA; border-color: #EF9F27; }
+  .t-coral  { background: #FAECE7; border-color: #F0997B; }
+  .t-purple { background: #EEEDFE; border-color: #AFA9EC; }
+  .t-red    { background: #FCEBEB; border-color: #F09595; }
+  .blocked  { opacity: 0.45; position: relative; }
+  .blocked::after { content: "🚫"; position: absolute; right: 6px; top: 6px; font-size: 14px; }
+  .controls { display: flex; gap: 16px; align-items: flex-end; flex-wrap: wrap; margin-bottom: 1.5rem; }
+  .ctrl-group { display: flex; flex-direction: column; gap: 4px; }
+  .ctrl-label { font-size: 12px; color: var(--color-text-secondary); }
+  .ctrl-row { display: flex; align-items: center; gap: 8px; }
+  .ctrl-val { font-size: 14px; font-weight: 500; min-width: 20px; text-align: center; color: var(--color-text-primary); }
+  .btn-ctrl { background: var(--color-background-primary); border: 0.5px solid var(--color-border-secondary); border-radius: 6px; width: 26px; height: 26px; cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center; }
+  .btn-ctrl:hover { background: var(--color-background-secondary); }
+  .metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 1.5rem; }
+  .metric-card { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 12px; }
+  .metric-label { font-size: 11px; color: var(--color-text-secondary); margin-bottom: 4px; }
+  .metric-val { font-size: 22px; font-weight: 500; color: var(--color-text-primary); }
+  .metric-sub { font-size: 11px; color: var(--color-text-secondary); margin-top: 2px; }
+  .insight { border-radius: var(--border-radius-md); padding: 10px 14px; font-size: 13px; color: var(--color-text-primary); border: 0.5px solid var(--color-border-tertiary); margin-bottom: 1rem; line-height: 1.5; }
+  .ins-good { background: #EAF3DE; border-color: #97C459; }
+  .ins-warn { background: #FAEEDA; border-color: #EF9F27; }
+  .ins-bad  { background: #FCEBEB; border-color: #F09595; }
+  .btn-add { font-size: 12px; padding: 5px 12px; border-radius: 6px; cursor: pointer; background: var(--color-background-primary); border: 0.5px solid var(--color-border-secondary); color: var(--color-text-secondary); width: 100%; margin-top: 4px; }
+  .btn-add:hover { background: var(--color-background-secondary); }
+  .sim-btn { font-size: 13px; padding: 7px 16px; border-radius: var(--border-radius-md); cursor: pointer; background: var(--color-background-primary); border: 0.5px solid var(--color-border-secondary); color: var(--color-text-primary); }
+  .sim-btn:hover { background: var(--color-background-secondary); }
+  .h3 { font-size: 14px; font-weight: 500; color: var(--color-text-primary); margin: 0 0 8px; }
+  .legend { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; }
+  .leg-item { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--color-text-secondary); }
+  .leg-dot { width: 10px; height: 10px; border-radius: 3px; }
+
+  /* Dark-mode state palette */
+  .wip-ok   { background: #1d3a20; color: #d6efbb; }
+  .wip-warn { background: #3b2a10; color: #ffe1a3; }
+  .wip-over { background: #471d22; color: #ffd1d1; }
+  .t-blue   { background: #102d4d; border-color: #378add; }
+  .t-green  { background: #1d3a20; border-color: #97c459; }
+  .t-amber  { background: #3b2a10; border-color: #ef9f27; }
+  .t-coral  { background: #3b2119; border-color: #f0997b; }
+  .t-purple { background: #29255a; border-color: #afa9ec; }
+  .t-red    { background: #471d22; border-color: #f09595; }
+  .ins-good { background: #1d3a20; border-color: #97c459; color: #d6efbb; }
+  .ins-warn { background: #3b2a10; border-color: #ef9f27; color: #ffe1a3; }
+  .ins-bad  { background: #471d22; border-color: #f09595; color: #ffd1d1; }
+</style>
+<script>
+window.sendPrompt = window.sendPrompt || function(prompt) {
+  console.info("Prompt action:", prompt);
+};
+</script>
+<div class="wrap">
+  <h2 class="sr-only">Simulador interactivo de WIP Limits en un tablero Kanban</h2>
+
+  <div class="controls">
+    <div class="ctrl-group">
+      <span class="ctrl-label">WIP limit — En análisis</span>
+      <div class="ctrl-row">
+        <button class="btn-ctrl" onclick="changeLimit('analysis', -1)">−</button>
+        <span class="ctrl-val" id="lim-analysis">3</span>
+        <button class="btn-ctrl" onclick="changeLimit('analysis', +1)">+</button>
+      </div>
+    </div>
+    <div class="ctrl-group">
+      <span class="ctrl-label">WIP limit — En desarrollo</span>
+      <div class="ctrl-row">
+        <button class="btn-ctrl" onclick="changeLimit('dev', -1)">−</button>
+        <span class="ctrl-val" id="lim-dev">2</span>
+        <button class="btn-ctrl" onclick="changeLimit('dev', +1)">+</button>
+      </div>
+    </div>
+    <div class="ctrl-group">
+      <span class="ctrl-label">WIP limit — En revisión</span>
+      <div class="ctrl-row">
+        <button class="btn-ctrl" onclick="changeLimit('review', -1)">−</button>
+        <span class="ctrl-val" id="lim-review">2</span>
+        <button class="btn-ctrl" onclick="changeLimit('review', +1)">+</button>
+      </div>
+    </div>
+    <button class="sim-btn" onclick="simulate()">▶ Simular un sprint</button>
+  </div>
+
+  <div class="board" id="board"></div>
+
+  <div id="insight-box" class="insight"></div>
+
+  <div class="metrics">
+    <div class="metric-card">
+      <div class="metric-label">Cycle time promedio</div>
+      <div class="metric-val" id="m-cycle">—</div>
+      <div class="metric-sub">días por ticket</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Throughput</div>
+      <div class="metric-val" id="m-through">—</div>
+      <div class="metric-sub">tickets / semana</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Bloqueos activos</div>
+      <div class="metric-val" id="m-blocked">—</div>
+      <div class="metric-sub">items esperando</div>
+    </div>
+  </div>
+
+  <div class="legend">
+    <div class="leg-item"><div class="leg-dot" style="background:#85B7EB"></div> Feature</div>
+    <div class="leg-item"><div class="leg-dot" style="background:#97C459"></div> Bug fix</div>
+    <div class="leg-item"><div class="leg-dot" style="background:#EF9F27"></div> Deuda técnica</div>
+    <div class="leg-item"><div class="leg-dot" style="background:#F0997B"></div> Investigación</div>
+    <div class="leg-item"><div class="leg-dot" style="background:#AFA9EC"></div> Infraestructura</div>
+  </div>
+</div>
+
+<script>
+const COLS = [
+  { id: 'backlog',  title: 'Backlog',       limitKey: null },
+  { id: 'analysis', title: 'En análisis',   limitKey: 'analysis' },
+  { id: 'dev',      title: 'En desarrollo', limitKey: 'dev' },
+  { id: 'review',   title: 'En revisión',   limitKey: 'review' },
+];
+
+const TICKET_TYPES = [
+  { tag: 'Feature',         cls: 't-blue' },
+  { tag: 'Bug fix',         cls: 't-green' },
+  { tag: 'Deuda técnica',   cls: 't-amber' },
+  { tag: 'Investigación',   cls: 't-coral' },
+  { tag: 'Infraestructura', cls: 't-purple' },
+];
+
+const TITLES = [
+  'Rediseño de login', 'API rate limiting', 'Cache de sesiones',
+  'Dashboard analytics', 'Notificaciones push', 'Migración DB',
+  'Tests de regresión', 'Documentación API', 'Onboarding flow',
+  'Refactor auth module', 'Mejora de búsqueda', 'Export CSV',
+  'Alertas de error', 'Pipeline CI/CD', 'SSO integración',
+];
+
+let limits = { analysis: 3, dev: 2, review: 2 };
+
+let board = {
+  backlog:  shuffle(TITLES).slice(0,5).map((t,i) => mkTicket(t, i)),
+  analysis: shuffle(TITLES).slice(5,8).map((t,i) => mkTicket(t, i+5)),
+  dev:      shuffle(TITLES).slice(8,10).map((t,i) => mkTicket(t, i+8)),
+  review:   shuffle(TITLES).slice(10,11).map((t,i) => mkTicket(t, i+10)),
+};
+
+let simRan = false;
+
+function mkTicket(title, idx) {
+  const type = TICKET_TYPES[idx % TICKET_TYPES.length];
+  return { id: idx, title, tag: type.tag, cls: type.cls };
+}
+
+function shuffle(arr) {
+  return [...arr].sort(() => Math.random() - 0.5);
+}
+
+function changeLimit(key, delta) {
+  limits[key] = Math.max(1, Math.min(6, limits[key] + delta));
+  document.getElementById('lim-' + key).textContent = limits[key];
+  render();
+}
+
+function countBlocked() {
+  let b = 0;
+  ['analysis','dev','review'].forEach(k => {
+    const over = board[k].length - limits[k];
+    if (over > 0) b += over;
+  });
+  return b;
+}
+
+function calcCycleTime() {
+  const blocked = countBlocked();
+  const base = 3.2;
+  return +(base + blocked * 1.4 + Math.random() * 0.5).toFixed(1);
+}
+
+function calcThroughput(cycleTime) {
+  return Math.max(1, Math.round(14 / cycleTime));
+}
+
+function getInsight() {
+  const blocked = countBlocked();
+  const totalWip = board.analysis.length + board.dev.length + board.review.length;
+  if (blocked === 0 && totalWip <= (limits.analysis + limits.dev + limits.review) - 2) {
+    return { cls: 'ins-good', msg: '✓ Flujo saludable. Los límites permiten que el trabajo avance sin acumular colas. El equipo puede enfocarse.' };
+  } else if (blocked === 0) {
+    return { cls: 'ins-warn', msg: '⚠ Estás en el límite. Cualquier ticket nuevo puede crear bloqueo. Considera terminar antes de agregar.' };
+  } else if (blocked <= 2) {
+    return { cls: 'ins-warn', msg: `⚠ ${blocked} ticket(s) bloqueados esperando capacidad. El cycle time empieza a subir. ¿Alguien puede "jalar" del cuello de botella?` };
+  } else {
+    return { cls: 'ins-bad', msg: `✗ Sistema sobrecargado — ${blocked} items bloqueados. El equipo está multitasking y el cycle time se dispara. Sube los límites o termina tareas primero.` };
+  }
+}
+
+function render() {
+  const boardEl = document.getElementById('board');
+  boardEl.innerHTML = '';
+
+  COLS.forEach(col => {
+    const items = board[col.id];
+    const limit = col.limitKey ? limits[col.limitKey] : null;
+    const over  = limit !== null ? items.length > limit : false;
+    const atLim = limit !== null ? items.length === limit : false;
+
+    let badgeCls = 'wip-ok';
+    if (over)  badgeCls = 'wip-over';
+    else if (atLim) badgeCls = 'wip-warn';
+
+    const colEl = document.createElement('div');
+    colEl.className = 'col';
+    colEl.innerHTML = `
+      <div class="col-header">
+        <span class="col-title">${col.title}</span>
+        ${limit !== null ? `<span class="wip-badge ${badgeCls}">${items.length}/${limit}</span>` : `<span class="wip-badge wip-ok">${items.length}</span>`}
+      </div>
+    `;
+
+    items.forEach((ticket, idx) => {
+      const isBlocked = limit !== null && idx >= limit;
+      const div = document.createElement('div');
+      div.className = `ticket ${ticket.cls}${isBlocked ? ' blocked' : ''}`;
+      div.innerHTML = `<div class="ticket-title">${ticket.title}</div><div class="ticket-tag">${ticket.tag}</div>`;
+      colEl.appendChild(div);
+    });
+
+    boardEl.appendChild(colEl);
+  });
+
+  const blocked = countBlocked();
+  const ins = getInsight();
+  const insEl = document.getElementById('insight-box');
+  insEl.className = 'insight ' + ins.cls;
+  insEl.textContent = ins.msg;
+
+  if (simRan) {
+    const ct = calcCycleTime();
+    document.getElementById('m-cycle').textContent = ct;
+    document.getElementById('m-through').textContent = calcThroughput(ct);
+    document.getElementById('m-blocked').textContent = blocked;
+  }
+}
+
+function simulate() {
+  simRan = true;
+  const ct = calcCycleTime();
+  document.getElementById('m-cycle').textContent = ct;
+  document.getElementById('m-through').textContent = calcThroughput(ct);
+  document.getElementById('m-blocked').textContent = countBlocked();
+  render();
+}
+
+render();
+</script>

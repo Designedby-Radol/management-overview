@@ -1,0 +1,272 @@
+
+<style>
+:root {
+  color-scheme: dark;
+  --font-sans: Inter, "Segoe UI", Arial, sans-serif;
+  --color-background-primary: #14161b;
+  --color-background-secondary: #1e222a;
+  --color-text-primary: #f4f7fb;
+  --color-text-secondary: #aeb8c7;
+  --color-text-tertiary: #7f8a9a;
+  --color-border-primary: #7f8a9a;
+  --color-border-secondary: #46505f;
+  --color-border-tertiary: #2c3440;
+  --border-radius-md: 8px;
+  --border-radius-lg: 8px;
+}
+* { box-sizing: border-box; }
+html, body { min-height: 100%; margin: 0; background: var(--color-background-primary); color: var(--color-text-primary); }
+body { padding: 16px; }
+.wrap { padding: 1rem 0; font-family: var(--font-sans); }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); }
+.section-title { font-size: 13px; font-weight: 500; color: var(--color-text-secondary); margin: 0 0 10px; text-transform: uppercase; letter-spacing: .04em; }
+.pipeline { display: flex; align-items: flex-start; gap: 0; margin-bottom: 1.5rem; position: relative; }
+.stage-wrap { display: flex; align-items: center; flex: 1; min-width: 0; }
+.stage { flex: 1; min-width: 0; border-radius: var(--border-radius-lg); border: 0.5px solid var(--color-border-tertiary); background: var(--color-background-secondary); padding: 12px 10px; position: relative; transition: border-color 0.3s, background 0.3s; cursor: pointer; }
+.stage.bottleneck { border-color: #E24B4A; background: #FCEBEB; }
+.stage.bottleneck .stage-name { color: #A32D2D; }
+.stage.optimized { border-color: #639922; background: #EAF3DE; }
+.stage.optimized .stage-name { color: #3B6D11; }
+.stage-name { font-size: 13px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 8px; }
+.stage-cap { font-size: 11px; color: var(--color-text-secondary); margin-bottom: 6px; }
+.capacity-bar-wrap { height: 6px; background: var(--color-background-primary); border-radius: 99px; overflow: hidden; margin-bottom: 8px; border: 0.5px solid var(--color-border-tertiary); }
+.capacity-bar { height: 100%; border-radius: 99px; transition: width 0.4s, background 0.4s; }
+.queue-dots { display: flex; flex-wrap: wrap; gap: 3px; min-height: 20px; }
+.dot { width: 8px; height: 8px; border-radius: 2px; background: #B5D4F4; transition: background 0.3s; }
+.dot.stacked { background: #E24B4A; }
+.dot.flowing { background: #639922; }
+.arrow-connector { display: flex; align-items: center; padding: 0 4px; padding-top: 28px; flex-shrink: 0; }
+.arrow-svg { overflow: visible; }
+.controls-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 1.5rem; }
+.ctrl-card { background: var(--color-background-secondary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); padding: 10px 12px; }
+.ctrl-card.is-bottleneck { border-color: #E24B4A; background: #FCEBEB; }
+.ctrl-card.is-bottleneck .ctrl-name { color: #A32D2D; }
+.ctrl-card.is-optimized { border-color: #639922; background: #EAF3DE; }
+.ctrl-name { font-size: 12px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 8px; }
+.ctrl-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.ctrl-label { font-size: 11px; color: var(--color-text-secondary); width: 100px; flex-shrink: 0; }
+.ctrl-val { font-size: 12px; font-weight: 500; min-width: 22px; text-align: center; color: var(--color-text-primary); }
+.btn-s { background: var(--color-background-primary); border: 0.5px solid var(--color-border-secondary); border-radius: 5px; width: 22px; height: 22px; cursor: pointer; font-size: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.btn-s:hover { background: var(--color-background-secondary); }
+.metrics-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 1.5rem; }
+.met { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 10px 12px; }
+.met-label { font-size: 11px; color: var(--color-text-secondary); margin-bottom: 3px; }
+.met-val { font-size: 20px; font-weight: 500; color: var(--color-text-primary); }
+.met-sub { font-size: 10px; color: var(--color-text-secondary); margin-top: 2px; }
+.insight-panel { border-radius: var(--border-radius-md); padding: 12px 14px; font-size: 13px; line-height: 1.6; border: 0.5px solid var(--color-border-tertiary); margin-bottom: 1rem; }
+.insight-panel.good { background: #EAF3DE; border-color: #97C459; color: #27500A; }
+.insight-panel.warn { background: #FAEEDA; border-color: #EF9F27; color: #633806; }
+.insight-panel.bad  { background: #FCEBEB; border-color: #F09595; color: #791F1F; }
+.toc-steps { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-bottom: 1rem; }
+.toc-step { background: var(--color-background-secondary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); padding: 8px; text-align: center; }
+.toc-num { font-size: 16px; font-weight: 500; color: var(--color-text-secondary); margin-bottom: 4px; }
+.toc-label { font-size: 11px; color: var(--color-text-secondary); line-height: 1.4; }
+.toc-step.active { border-color: #639922; background: #EAF3DE; }
+.toc-step.active .toc-num { color: #3B6D11; }
+.toc-step.active .toc-label { color: #3B6D11; }
+.badge-bn { display: inline-block; font-size: 10px; background: #FCEBEB; color: #A32D2D; border-radius: 4px; padding: 1px 6px; margin-left: 4px; font-weight: 500; }
+.explain-btn { font-size: 12px; padding: 5px 12px; border-radius: 6px; cursor: pointer; background: var(--color-background-primary); border: 0.5px solid var(--color-border-secondary); color: var(--color-text-secondary); margin-top: 8px; width: 100%; }
+.explain-btn:hover { background: var(--color-background-secondary); }
+
+/* Dark-mode state palette */
+.stage.bottleneck, .ctrl-card.is-bottleneck { border-color: #f09595; background: #471d22; }
+.stage.bottleneck .stage-name, .ctrl-card.is-bottleneck .ctrl-name { color: #ffd1d1; }
+.stage.optimized, .ctrl-card.is-optimized, .toc-step.active { border-color: #97c459; background: #1d3a20; }
+.stage.optimized .stage-name, .toc-step.active .toc-num, .toc-step.active .toc-label { color: #d6efbb; }
+.insight-panel.good { background: #1d3a20; border-color: #97c459; color: #d6efbb; }
+.insight-panel.warn { background: #3b2a10; border-color: #ef9f27; color: #ffe1a3; }
+.insight-panel.bad  { background: #471d22; border-color: #f09595; color: #ffd1d1; }
+.badge-bn { background: #471d22; color: #ffd1d1; }
+</style>
+
+<script>
+window.sendPrompt = window.sendPrompt || function(prompt) {
+  console.info("Prompt action:", prompt);
+};
+</script>
+<div class="wrap">
+<h2 class="sr-only">Simulador de Theory of Constraints y WIP Limits — pipeline interactivo</h2>
+
+<p class="section-title">Pipeline de entrega — ajusta capacidad y WIP por etapa</p>
+
+<div class="pipeline" id="pipeline-vis"></div>
+
+<div class="controls-grid" id="controls-grid"></div>
+
+<div class="metrics-row">
+  <div class="met"><div class="met-label">Throughput del sistema</div><div class="met-val" id="m-tp">—</div><div class="met-sub">unidades/semana</div></div>
+  <div class="met"><div class="met-label">Cycle time total</div><div class="met-val" id="m-ct">—</div><div class="met-sub">días promedio</div></div>
+  <div class="met"><div class="met-label">Cuello de botella</div><div class="met-val" id="m-bn" style="font-size:13px;padding-top:4px">—</div><div class="met-sub">etapa limitante</div></div>
+  <div class="met"><div class="met-label">Items en cola total</div><div class="met-val" id="m-q">—</div><div class="met-sub">esperando avanzar</div></div>
+</div>
+
+<div id="insight-panel" class="insight-panel warn">Ajusta las capacidades para ver el análisis del sistema.</div>
+
+<p class="section-title" style="margin-top:0.5rem">Los 5 pasos de la Theory of Constraints (Goldratt)</p>
+<div class="toc-steps" id="toc-steps">
+  <div class="toc-step" id="toc-1"><div class="toc-num">1</div><div class="toc-label">Identificar la restricción</div></div>
+  <div class="toc-step" id="toc-2"><div class="toc-num">2</div><div class="toc-label">Explotar la restricción</div></div>
+  <div class="toc-step" id="toc-3"><div class="toc-num">3</div><div class="toc-label">Subordinar todo lo demás</div></div>
+  <div class="toc-step" id="toc-4"><div class="toc-num">4</div><div class="toc-label">Elevar la restricción</div></div>
+  <div class="toc-step" id="toc-5"><div class="toc-num">5</div><div class="toc-label">Volver al paso 1</div></div>
+</div>
+
+</div>
+
+<script>
+const STAGES = [
+  { id: 'backlog',   name: 'Backlog / intake', cap: 10, wip: 5,  color: '#B5D4F4' },
+  { id: 'analysis',  name: 'Análisis',         cap: 4,  wip: 3,  color: '#C0DD97' },
+  { id: 'dev',       name: 'Desarrollo',       cap: 3,  wip: 2,  color: '#AFA9EC' },
+  { id: 'review',    name: 'Revisión / QA',    cap: 2,  wip: 2,  color: '#FAC775' },
+];
+
+function getBottleneck() {
+  let minCap = Infinity, bnIdx = 0;
+  STAGES.slice(1).forEach((s, i) => {
+    if (s.cap < minCap) { minCap = s.cap; bnIdx = i + 1; }
+  });
+  return bnIdx;
+}
+
+function calcMetrics() {
+  const bnIdx = getBottleneck();
+  const bn = STAGES[bnIdx];
+  const throughput = Math.min(...STAGES.slice(1).map(s => s.cap));
+  const cycleTime = STAGES.slice(1).reduce((acc, s) => {
+    const load = Math.min(s.wip, s.cap);
+    return acc + (1 / load) * 2.2;
+  }, 0);
+  const totalQueue = STAGES.reduce((acc, s) => {
+    const q = Math.max(0, s.wip - s.cap);
+    return acc + q;
+  }, 0);
+  return { throughput, cycleTime: +cycleTime.toFixed(1), bnIdx, bnName: bn.name, totalQueue };
+}
+
+function renderPipeline() {
+  const { bnIdx } = calcMetrics();
+  const vis = document.getElementById('pipeline-vis');
+  vis.innerHTML = '';
+  STAGES.forEach((s, i) => {
+    const wrap = document.createElement('div');
+    wrap.className = 'stage-wrap';
+
+    const stage = document.createElement('div');
+    const isBn = i === bnIdx && i > 0;
+    const isOpt = i > 0 && s.cap > STAGES[bnIdx].cap;
+    stage.className = 'stage' + (isBn ? ' bottleneck' : isOpt ? ' optimized' : '');
+    stage.title = isBn ? 'Este es el cuello de botella — limita todo el sistema' : '';
+
+    const fillPct = Math.min(100, Math.round((s.wip / s.cap) * 100));
+    const barColor = isBn ? '#E24B4A' : (fillPct >= 100 ? '#E24B4A' : fillPct >= 75 ? '#EF9F27' : '#639922');
+
+    const dotsHtml = Array.from({length: Math.min(s.wip, 10)}, (_, di) => {
+      const stacked = di >= s.cap;
+      const flowing = !stacked && s.cap > STAGES[bnIdx].cap;
+      return `<div class="dot${stacked ? ' stacked' : flowing ? ' flowing' : ''}"></div>`;
+    }).join('');
+
+    stage.innerHTML = `
+      <div class="stage-name">${s.name}${isBn ? '<span class="badge-bn">⚠ BN</span>' : ''}</div>
+      <div class="stage-cap">Cap: ${s.cap} · WIP: ${s.wip}</div>
+      <div class="capacity-bar-wrap"><div class="capacity-bar" style="width:${fillPct}%;background:${barColor}"></div></div>
+      <div class="queue-dots">${dotsHtml}</div>
+    `;
+    wrap.appendChild(stage);
+
+    if (i < STAGES.length - 1) {
+      const arr = document.createElement('div');
+      arr.className = 'arrow-connector';
+      arr.innerHTML = `<svg class="arrow-svg" width="20" height="16" viewBox="0 0 20 16">
+        <line x1="0" y1="8" x2="14" y2="8" stroke="var(--color-border-secondary)" stroke-width="1"/>
+        <path d="M10 3L17 8L10 13" fill="none" stroke="var(--color-border-secondary)" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>`;
+      wrap.appendChild(arr);
+    }
+
+    vis.appendChild(wrap);
+  });
+}
+
+function renderControls() {
+  const { bnIdx } = calcMetrics();
+  const grid = document.getElementById('controls-grid');
+  grid.innerHTML = '';
+  STAGES.forEach((s, i) => {
+    const isBn = i === bnIdx && i > 0;
+    const isOpt = i > 0 && s.cap > STAGES[bnIdx].cap;
+    const card = document.createElement('div');
+    card.className = 'ctrl-card' + (isBn ? ' is-bottleneck' : isOpt ? ' is-optimized' : '');
+    card.innerHTML = `
+      <div class="ctrl-name">${s.name}${isBn ? ' <span class="badge-bn">cuello de botella</span>' : ''}</div>
+      <div class="ctrl-row">
+        <span class="ctrl-label">Capacidad (personas)</span>
+        <button class="btn-s" onclick="changeStage(${i},'cap',-1)">−</button>
+        <span class="ctrl-val" id="cap-${i}">${s.cap}</span>
+        <button class="btn-s" onclick="changeStage(${i},'cap',+1)">+</button>
+      </div>
+      <div class="ctrl-row">
+        <span class="ctrl-label">WIP actual</span>
+        <button class="btn-s" onclick="changeStage(${i},'wip',-1)">−</button>
+        <span class="ctrl-val" id="wip-${i}">${s.wip}</span>
+        <button class="btn-s" onclick="changeStage(${i},'wip',+1)">+</button>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+function renderMetrics() {
+  const m = calcMetrics();
+  document.getElementById('m-tp').textContent = m.throughput;
+  document.getElementById('m-ct').textContent = m.cycleTime;
+  document.getElementById('m-bn').textContent = m.bnName;
+  document.getElementById('m-q').textContent = m.totalQueue;
+
+  const panel = document.getElementById('insight-panel');
+  const { bnIdx } = m;
+  const bn = STAGES[bnIdx];
+  const maxCap = Math.max(...STAGES.slice(1).map(s => s.cap));
+
+  let cls, msg;
+  if (bn.cap >= maxCap) {
+    cls = 'good';
+    msg = `✓ Sistema balanceado. No hay un cuello de botella claro — todas las etapas tienen capacidad similar. Throughput: ${m.throughput} unidades/semana.`;
+  } else if (bn.cap >= maxCap * 0.6) {
+    cls = 'warn';
+    msg = `⚠ "${bn.name}" es la restricción del sistema (cap: ${bn.cap}). Elevar esta etapa tiene más impacto que optimizar cualquier otra. Aplica ToC paso 4: ¿puedes sumar capacidad aquí?`;
+  } else {
+    cls = 'bad';
+    msg = `✗ Cuello de botella severo en "${bn.name}" (cap: ${bn.cap} vs max ${maxCap}). Optimizar otras etapas es desperdicio puro — todo el throughput lo decide esta etapa. ToC: subordina TODO lo demás a este cuello.`;
+  }
+  panel.className = `insight-panel ${cls}`;
+  panel.textContent = msg;
+
+  // ToC steps highlight
+  [1,2,3,4,5].forEach(n => {
+    document.getElementById('toc-'+n).className = 'toc-step';
+  });
+  if (bn.cap < maxCap) {
+    document.getElementById('toc-1').className = 'toc-step active';
+    if (m.totalQueue > 0) document.getElementById('toc-2').className = 'toc-step active';
+    document.getElementById('toc-3').className = 'toc-step active';
+  } else {
+    document.getElementById('toc-5').className = 'toc-step active';
+  }
+}
+
+function changeStage(idx, field, delta) {
+  const s = STAGES[idx];
+  s[field] = Math.max(1, Math.min(12, s[field] + delta));
+  render();
+}
+
+function render() {
+  renderPipeline();
+  renderControls();
+  renderMetrics();
+}
+
+render();
+</script>

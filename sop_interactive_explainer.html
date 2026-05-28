@@ -1,0 +1,347 @@
+
+<style>
+:root {
+  color-scheme: dark;
+  --font-sans: Inter, "Segoe UI", Arial, sans-serif;
+  --color-background-primary: #14161b;
+  --color-background-secondary: #1e222a;
+  --color-text-primary: #f4f7fb;
+  --color-text-secondary: #aeb8c7;
+  --color-text-tertiary: #7f8a9a;
+  --color-border-primary: #7f8a9a;
+  --color-border-secondary: #46505f;
+  --color-border-tertiary: #2c3440;
+  --border-radius-md: 8px;
+  --border-radius-lg: 8px;
+}
+* { box-sizing: border-box; }
+html, body { min-height: 100%; margin: 0; background: var(--color-background-primary); color: var(--color-text-primary); }
+body { padding: 16px; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); }
+body, .wrap { font-family: var(--font-sans); }
+.wrap { padding: 1rem 0; }
+.stepper-dots { display: flex; gap: 8px; margin-bottom: 1.25rem; align-items: center; }
+.dot-step { width: 10px; height: 10px; border-radius: 50%; background: var(--color-border-secondary); transition: background .25s, transform .2s; cursor: pointer; }
+.dot-step.active { background: var(--color-text-primary); transform: scale(1.3); }
+.step-label { font-size: 12px; color: var(--color-text-secondary); margin-left: 4px; }
+.panel { border-radius: var(--border-radius-lg); border: 0.5px solid var(--color-border-tertiary); background: var(--color-background-primary); padding: 1.25rem; margin-bottom: 1rem; }
+.panel-header { display: flex; align-items: baseline; gap: 10px; margin-bottom: 8px; }
+.panel-num { font-size: 11px; font-weight: 500; color: var(--color-text-secondary); background: var(--color-background-secondary); border-radius: 99px; padding: 2px 8px; }
+.panel-title { font-size: 15px; font-weight: 500; color: var(--color-text-primary); }
+.panel-sub { font-size: 13px; color: var(--color-text-secondary); line-height: 1.6; margin-bottom: 12px; }
+.who-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+.who-chip { font-size: 11px; padding: 3px 10px; border-radius: 99px; border: 0.5px solid var(--color-border-tertiary); color: var(--color-text-secondary); background: var(--color-background-secondary); }
+.who-chip.lead { background: #E6F1FB; border-color: #85B7EB; color: #0C447C; }
+.output-row { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 8px 12px; font-size: 12px; color: var(--color-text-secondary); margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
+.output-row::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--color-border-secondary); flex-shrink: 0; }
+.output-row.key { color: var(--color-text-primary); }
+.output-row.key::before { background: #639922; }
+.nav-row { display: flex; gap: 8px; margin-top: 4px; }
+.btn-nav { font-size: 13px; padding: 6px 16px; border-radius: var(--border-radius-md); cursor: pointer; background: var(--color-background-primary); border: 0.5px solid var(--color-border-secondary); color: var(--color-text-primary); }
+.btn-nav:hover { background: var(--color-background-secondary); }
+.btn-nav.primary { background: var(--color-text-primary); color: var(--color-background-primary); border-color: transparent; }
+.btn-nav.primary:hover { opacity: .88; }
+.gap-indicator { display: flex; gap: 12px; margin-bottom: 12px; }
+.gap-card { flex: 1; border-radius: var(--border-radius-md); padding: 10px 12px; border: 0.5px solid var(--color-border-tertiary); }
+.gap-label { font-size: 11px; color: var(--color-text-secondary); margin-bottom: 3px; }
+.gap-val { font-size: 18px; font-weight: 500; }
+.gap-val.red { color: #A32D2D; }
+.gap-val.green { color: #3B6D11; }
+.gap-val.amber { color: #854F0B; }
+.gap-desc { font-size: 11px; color: var(--color-text-secondary); margin-top: 2px; }
+.section-lbl { font-size: 11px; font-weight: 500; color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: .05em; margin: 0 0 6px; }
+.slider-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.slider-label { font-size: 12px; color: var(--color-text-secondary); width: 120px; flex-shrink: 0; }
+.slider-val { font-size: 13px; font-weight: 500; min-width: 44px; text-align: right; color: var(--color-text-primary); }
+.chart-wrap { height: 80px; position: relative; margin-bottom: 8px; }
+canvas { width: 100% !important; }
+.insight-bar { border-radius: var(--border-radius-md); padding: 8px 12px; font-size: 12px; line-height: 1.55; border: 0.5px solid; }
+.ins-good { background: #EAF3DE; border-color: #97C459; color: #27500A; }
+.ins-warn { background: #FAEEDA; border-color: #EF9F27; color: #633806; }
+.ins-bad  { background: #FCEBEB; border-color: #F09595; color: #791F1F; }
+.cycle-flow { display: flex; align-items: center; gap: 0; margin-bottom: 1rem; overflow-x: auto; }
+.cf-node { border-radius: var(--border-radius-md); border: 0.5px solid var(--color-border-tertiary); padding: 8px 12px; font-size: 12px; font-weight: 500; color: var(--color-text-primary); background: var(--color-background-secondary); white-space: nowrap; cursor: pointer; transition: background .15s; }
+.cf-node:hover { background: var(--color-background-primary); }
+.cf-node.active { background: var(--color-text-primary); color: var(--color-background-primary); border-color: transparent; }
+.cf-arrow { font-size: 14px; color: var(--color-text-secondary); padding: 0 4px; flex-shrink: 0; }
+
+/* Dark-mode state palette */
+.who-chip.lead { background: #102d4d; border-color: #378add; color: #b5d4f4; }
+.ins-good { background: #1d3a20; border-color: #97c459; color: #d6efbb; }
+.ins-warn { background: #3b2a10; border-color: #ef9f27; color: #ffe1a3; }
+.ins-bad  { background: #471d22; border-color: #f09595; color: #ffd1d1; }
+.gap-card[style*="#FCEBEB"] { background: #471d22 !important; border-color: #f09595 !important; }
+.gap-card[style*="#FAEEDA"] { background: #3b2a10 !important; border-color: #ef9f27 !important; }
+.gap-card[style*="#EAF3DE"] { background: #1d3a20 !important; border-color: #97c459 !important; }
+</style>
+
+<script>
+window.sendPrompt = window.sendPrompt || function(prompt) {
+  console.info("Prompt action:", prompt);
+};
+</script>
+
+<div class="wrap">
+<h2 class="sr-only">Explicador interactivo de S&OP: Sales and Operations Planning — ciclo mensual de 5 pasos</h2>
+
+<div class="cycle-flow" id="cycle-flow"></div>
+
+<div id="panel-area"></div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const STEPS = [
+  {
+    num: "Semana 1",
+    title: "Revisión de demanda",
+    color: "c-blue",
+    sub: "Ventas, marketing y customer success se juntan para actualizar el forecast: ¿qué esperamos vender/entregar los próximos 3–18 meses? Se revisan pipelines, tendencias históricas y compromisos con clientes.",
+    who: ["Ventas (lead)", "Marketing", "Customer success", "Demand planner"],
+    outputs: [
+      { key: true, text: "Forecast de demanda revisado (unidades o revenue)" },
+      { key: false, text: "Variaciones vs forecast anterior" },
+      { key: false, text: "Supuestos y riesgos de mercado documentados" },
+    ],
+    insight: null,
+    interactive: "demand"
+  },
+  {
+    num: "Semana 1–2",
+    title: "Revisión de supply / capacidad",
+    color: "c-teal",
+    sub: "Operaciones toma el forecast de demanda y pregunta: ¿podemos cumplirlo? Se revisa capacidad de producción, headcount, proveedores y restricciones logísticas. Aquí entra la Theory of Constraints.",
+    who: ["Operaciones (lead)", "Supply chain", "Manufactura / Delivery", "RRHH"],
+    outputs: [
+      { key: true, text: "Plan de supply revisado y gaps de capacidad identificados" },
+      { key: false, text: "Opciones para cerrar gaps (horas extra, contratación, outsourcing)" },
+      { key: false, text: "Riesgos operativos y restricciones" },
+    ],
+    insight: null,
+    interactive: "supply"
+  },
+  {
+    num: "Semana 2",
+    title: "Revisión financiera",
+    color: "c-amber",
+    sub: "Finanzas toma demanda + supply y convierte todo a $. ¿El plan proyectado cumple los targets de revenue, margen y EBITDA? ¿Hay desvíos vs presupuesto? Aquí se conecta con el forecast financiero anual.",
+    who: ["CFO / Finance (lead)", "FP&A", "Controller"],
+    outputs: [
+      { key: true, text: "P&L proyectado del plan S&OP" },
+      { key: false, text: "Gap vs budget y vs forecast anterior" },
+      { key: false, text: "Escenarios financieros (base / upside / downside)" },
+    ],
+    insight: null,
+    interactive: "finance"
+  },
+  {
+    num: "Semana 3",
+    title: "Pre-S&OP meeting",
+    color: "c-purple",
+    sub: "Reunión de directores medios para reconciliar los tres planes: demanda vs supply vs finanzas. Se identifican los conflictos y se preparan opciones de decisión para que la alta dirección elija.",
+    who: ["Director de Operaciones", "Director Comercial", "Director Financiero", "PMO / Planner"],
+    outputs: [
+      { key: true, text: "Issues list con opciones y trade-offs cuantificados" },
+      { key: false, text: "Recomendación de plan consensuado (o lista de desacuerdos)" },
+      { key: false, text: "Agenda ejecutiva preparada" },
+    ],
+    insight: null,
+    interactive: null
+  },
+  {
+    num: "Semana 4",
+    title: "Executive S&OP",
+    color: "c-coral",
+    sub: "La reunión donde se toman las decisiones. C-suite revisa el plan reconciliado, decide sobre los trade-offs, autoriza presupuesto adicional si aplica y aprueba el plan del mes. Las decisiones se comunican a toda la organización.",
+    who: ["CEO (lead)", "CFO", "COO", "CRO / VP Ventas", "CHRO"],
+    outputs: [
+      { key: true, text: "Plan aprobado para las próximas 4–18 semanas" },
+      { key: true, text: "Decisiones sobre trade-offs demanda/supply/presupuesto" },
+      { key: false, text: "Minutas y compromisos formales con owners y fechas" },
+    ],
+    insight: null,
+    interactive: null
+  }
+];
+
+let currentStep = 0;
+let demandForecast = 100;
+let supplyCapacity = 85;
+let budgetTarget = 90;
+let charts = {};
+
+function renderFlow() {
+  const el = document.getElementById('cycle-flow');
+  el.innerHTML = '';
+  STEPS.forEach((s, i) => {
+    const node = document.createElement('div');
+    node.className = 'cf-node' + (i === currentStep ? ' active' : '');
+    node.textContent = s.title;
+    node.onclick = () => { currentStep = i; render(); };
+    el.appendChild(node);
+    if (i < STEPS.length - 1) {
+      const arr = document.createElement('div');
+      arr.className = 'cf-arrow';
+      arr.textContent = '›';
+      el.appendChild(arr);
+    }
+  });
+}
+
+function getGaps() {
+  const gap = demandForecast - supplyCapacity;
+  const finGap = supplyCapacity - budgetTarget;
+  return { gap, finGap };
+}
+
+function getInsight(step) {
+  const { gap, finGap } = getGaps();
+  if (step === 0) {
+    if (demandForecast > 110) return { cls: 'ins-warn', msg: `Forecast de ${demandForecast} unidades está ${demandForecast - 100} por encima de la línea base. Verifica si hay oportunidades reales o si el pipeline está inflado.` };
+    if (demandForecast < 80) return { cls: 'ins-bad', msg: `Forecast bajo (${demandForecast}). ¿Hay riesgo en el pipeline? Investiga causas antes de pasar a supply.` };
+    return { cls: 'ins-good', msg: `Forecast de ${demandForecast} unidades. Razonable. Documenta supuestos clave para que supply pueda planear con confianza.` };
+  }
+  if (step === 1) {
+    if (gap > 15) return { cls: 'ins-bad', msg: `Gap demanda–supply de ${gap} unidades. Cuello de botella severo — necesitas opciones: horas extra, outsourcing o repriorizar entregas.` };
+    if (gap > 0) return { cls: 'ins-warn', msg: `Gap de ${gap} unidades. Supply no puede cubrir toda la demanda. El Pre-S&OP debe decidir cómo priorizar.` };
+    if (gap < -10) return { cls: 'ins-warn', msg: `Supply excede demanda en ${Math.abs(gap)} unidades. Riesgo de sobrestock o capacidad ociosa — revisa costo.` };
+    return { cls: 'ins-good', msg: `Supply alineado con demanda. Gap mínimo de ${gap}. Buen punto de partida para la revisión financiera.` };
+  }
+  if (step === 2) {
+    if (finGap < -10) return { cls: 'ins-bad', msg: `El plan está ${Math.abs(finGap)} puntos por debajo del budget. Finanzas va a frenar el plan. Necesitas cerrar el gap o pedir revisión del presupuesto.` };
+    if (finGap < 0) return { cls: 'ins-warn', msg: `Leve desvío de ${Math.abs(finGap)} puntos vs budget. Prepara escenarios alternativos para el Pre-S&OP.` };
+    return { cls: 'ins-good', msg: `Plan proyectado cubre o supera el budget target. Finanzas puede dar luz verde — llévalos igual para documentar los supuestos.` };
+  }
+  return null;
+}
+
+function renderInteractive(type) {
+  if (!type) return '';
+  if (type === 'demand') {
+    return `
+      <p class="section-lbl">Ajusta el forecast</p>
+      <div class="slider-row">
+        <span class="slider-label">Demanda forecast</span>
+        <input type="range" min="50" max="150" value="${demandForecast}" step="1"
+          oninput="demandForecast=parseInt(this.value);document.getElementById('d-val').textContent=this.value;refreshInsight(0)">
+        <span class="slider-val" id="d-val">${demandForecast}</span>
+      </div>
+    `;
+  }
+  if (type === 'supply') {
+    const { gap } = getGaps();
+    return `
+      <p class="section-lbl">Ajusta capacidad y observa el gap</p>
+      <div class="slider-row">
+        <span class="slider-label">Capacidad supply</span>
+        <input type="range" min="40" max="150" value="${supplyCapacity}" step="1"
+          oninput="supplyCapacity=parseInt(this.value);document.getElementById('s-val').textContent=this.value;document.getElementById('gap-num').textContent=(demandForecast-supplyCapacity);refreshInsight(1)">
+        <span class="slider-val" id="s-val">${supplyCapacity}</span>
+      </div>
+      <div class="gap-indicator">
+        <div class="gap-card" style="background:var(--color-background-secondary)">
+          <div class="gap-label">Demanda</div>
+          <div class="gap-val">${demandForecast}</div>
+        </div>
+        <div class="gap-card" style="background:var(--color-background-secondary)">
+          <div class="gap-label">Supply</div>
+          <div class="gap-val">${supplyCapacity}</div>
+        </div>
+        <div class="gap-card" style="background:${gap > 5 ? '#FCEBEB' : gap < -5 ? '#FAEEDA' : '#EAF3DE'};border-color:${gap > 5 ? '#F09595' : gap < -5 ? '#EF9F27' : '#97C459'}">
+          <div class="gap-label">Gap</div>
+          <div class="gap-val ${gap > 5 ? 'red' : gap < -5 ? 'amber' : 'green'}" id="gap-num">${gap}</div>
+          <div class="gap-desc">${gap > 5 ? 'demanda sin cubrir' : gap < -5 ? 'capacidad ociosa' : 'balanceado'}</div>
+        </div>
+      </div>
+    `;
+  }
+  if (type === 'finance') {
+    const { finGap } = getGaps();
+    return `
+      <p class="section-lbl">Proyección vs budget</p>
+      <div class="slider-row">
+        <span class="slider-label">Budget target</span>
+        <input type="range" min="50" max="140" value="${budgetTarget}" step="1"
+          oninput="budgetTarget=parseInt(this.value);document.getElementById('b-val').textContent=this.value;refreshInsight(2)">
+        <span class="slider-val" id="b-val">${budgetTarget}</span>
+      </div>
+      <div class="gap-indicator">
+        <div class="gap-card" style="background:var(--color-background-secondary)">
+          <div class="gap-label">Plan proyectado</div>
+          <div class="gap-val">${supplyCapacity}</div>
+        </div>
+        <div class="gap-card" style="background:var(--color-background-secondary)">
+          <div class="gap-label">Budget target</div>
+          <div class="gap-val">${budgetTarget}</div>
+        </div>
+        <div class="gap-card" style="background:${finGap < -5 ? '#FCEBEB' : '#EAF3DE'};border-color:${finGap < -5 ? '#F09595' : '#97C459'}">
+          <div class="gap-label">vs Budget</div>
+          <div class="gap-val ${finGap < -5 ? 'red' : 'green'}">${finGap >= 0 ? '+' : ''}${finGap}</div>
+          <div class="gap-desc">${finGap >= 0 ? 'por encima del target' : 'por debajo del target'}</div>
+        </div>
+      </div>
+    `;
+  }
+  return '';
+}
+
+function refreshInsight(step) {
+  const ins = getInsight(step);
+  const el = document.getElementById('insight-area');
+  if (el && ins) {
+    el.className = 'insight-bar ' + ins.cls;
+    el.textContent = ins.msg;
+  }
+  const gapEl = document.getElementById('gap-num');
+  if (gapEl) {
+    const { gap } = getGaps();
+    gapEl.textContent = gap;
+    gapEl.className = 'gap-val ' + (gap > 5 ? 'red' : gap < -5 ? 'amber' : 'green');
+    gapEl.closest('.gap-card').style.background = gap > 5 ? '#FCEBEB' : gap < -5 ? '#FAEEDA' : '#EAF3DE';
+    gapEl.closest('.gap-card').style.borderColor = gap > 5 ? '#F09595' : gap < -5 ? '#EF9F27' : '#97C459';
+  }
+}
+
+function renderPanel() {
+  const s = STEPS[currentStep];
+  const ins = getInsight(currentStep);
+  const interactive = renderInteractive(s.interactive);
+  const whoHtml = s.who.map((w, i) => `<span class="who-chip${i===0?' lead':''}">${w}</span>`).join('');
+  const outputsHtml = s.outputs.map(o => `<div class="output-row${o.key?' key':''}">${o.text}</div>`).join('');
+  const insHtml = ins ? `<div id="insight-area" class="insight-bar ${ins.cls}" style="margin-bottom:10px">${ins.msg}</div>` : `<div id="insight-area" style="display:none"></div>`;
+  const isLast = currentStep === STEPS.length - 1;
+  const isFirst = currentStep === 0;
+
+  document.getElementById('panel-area').innerHTML = `
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-num">${s.num}</span>
+        <span class="panel-title">${s.title}</span>
+      </div>
+      <p class="panel-sub">${s.sub}</p>
+      <p class="section-lbl">¿Quién participa?</p>
+      <div class="who-row">${whoHtml}</div>
+      ${interactive}
+      ${insHtml}
+      <p class="section-lbl">Outputs del paso</p>
+      ${outputsHtml}
+      <div class="nav-row" style="margin-top:14px">
+        ${!isFirst ? `<button class="btn-nav" onclick="go(-1)">← Anterior</button>` : ''}
+        ${!isLast ? `<button class="btn-nav primary" onclick="go(1)">Siguiente →</button>` : `<button class="btn-nav primary" onclick="sendPrompt('¿Cómo se conecta S&OP con OKRs y la planificación estratégica anual?')">¿Cómo conecta con OKRs? ↗</button>`}
+      </div>
+    </div>
+  `;
+}
+
+function go(delta) {
+  currentStep = Math.max(0, Math.min(STEPS.length - 1, currentStep + delta));
+  render();
+}
+
+function render() {
+  renderFlow();
+  renderPanel();
+}
+
+render();
+</script>
